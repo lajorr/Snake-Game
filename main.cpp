@@ -1,16 +1,18 @@
 #include <graphics.h>
 #include <time.h>
+#include <stdlib.h>
 #define height 700
-#define width 1350
+#define width 1280
 
 int i, X[100], Y[100], rx, ry, gm, gd, l, d = 2, s = 16;
 
 void boundary();
 void snakeinit();
 void food();
+int highScore(int);
 void startGame();
 void homeScreen();
-void gameOver(int);
+void gameOver(int, int);
 
 int main()
 {
@@ -28,39 +30,55 @@ void homeScreen()
 
 	int borderColor = 10;
 	int fillColor = 10;
+	int size = 50;
+
 	setfillstyle(SOLID_FILL, fillColor);
-	setcolor(borderColor);
+	// setcolor(borderColor);
 
 	/// horizontall
-	for (i = margin_x, j = margin_y; i < width - 50; i += 60)
+	for (i = margin_x, j = margin_y; i < width - 50; i += size)
 	{
-
-		rectangle(i, j, i + 50, j + 50);
+		setcolor(borderColor);
+		rectangle(i, j, i + (size - 10), j + (size - 10));
 		floodfill(i + 1, j + 1, borderColor);
-		if (i == margin_x + (60 * 21))
+
+		if (i == margin_x + (size * 24))
 		{
-			for (int k = 0; k < 2; k++)
+			for (int k = 0; k < 4; k++)
 			{
 
-				j += 60;
-				rectangle(i, j, i + 50, j + 50);
+				setcolor(borderColor);
+				rectangle(i, j, i + (size - 10), j + (size - 10));
 				floodfill(i + 1, j + 1, borderColor);
+				j += size;
 			}
+
+			rectangle(i + 14, j, i + (size - 10) - 13, j + (size - 10) - 28);
+			floodfill(i + 15, j + 1, borderColor);
+
+			rectangle(i, j + (size - 10) - 27, i + 13, j + (size - 10) - 14);
+			floodfill(i + 2, j + 14, borderColor);
+
+			rectangle(i + 28, j + (size - 10) - 27, i + (size - 10), j + (size - 10) - 14);
+			floodfill(i + 29, j + 14, borderColor);
+
+			rectangle(i + 14, j + (size - 12) - 11, i + (size - 10) - 13, j + (size - 12));
+			floodfill(i + 15, j + 30, borderColor);
 		}
 	}
 
 	// vertical
-	for (i = margin_x, j = margin_y + 60; j <= height - 50; j += 60)
+	for (i = margin_x, j = margin_y + size; j <= height - 50; j += size)
 	{
 		// setfillstyle(SOLID_FILL, BLUE);
 		// setcolor(GREEN);
-		rectangle(i, j, i + 50, j + 50);
+		rectangle(i, j, i + (size - 10), j + (size - 10));
 		floodfill(i + 1, j + 1, borderColor);
 		// 610 = current pos + (size * no of boxes)
-		if (j == (margin_y + 60) + (60 * 9))
+		if (j == (margin_y + size) + (size * 11))
 		{
-			i += 60;
-			rectangle(i, j, i + 50, j + 50);
+			i += size;
+			rectangle(i, j, i + (size - 10), j + (size - 10));
 			floodfill(i + 1, j + 1, borderColor);
 		}
 	}
@@ -94,6 +112,9 @@ void homeScreen()
 
 void startGame()
 {
+	int score;
+	int hscore;
+
 	cleardevice();
 	Sleep(300);
 	srand(time(NULL));
@@ -102,11 +123,10 @@ void startGame()
 
 	// resolution to full screen
 
-	// set boundary
-	boundary();
-
 	// fill initial snake body
 	snakeinit();
+	// set boundary
+	boundary();
 
 	// food at random location
 	food();
@@ -136,7 +156,7 @@ void startGame()
 		// terminating condition
 		if (getpixel(X[0], Y[0]) == 1)
 		{
-			printf("game over");
+
 			break;
 		}
 
@@ -165,19 +185,27 @@ void startGame()
 	}
 
 	// printing the score
-	printf("score : %d", l - 5);
-	printf("gameover");
-	gameOver(l - 5);
-	while (!GetAsyncKeyState(VK_RETURN))
-		;
+	score = l - 5;
+	printf("score : %d", score);
+	// printf("gameover");
+	hscore = highScore(score);
+	gameOver(score, hscore);
+	// while (!GetAsyncKeyState(VK_RETURN))
+	// 	;
 }
-void gameOver(int score)
+void gameOver(int score, int hscore)
 {
+	char ch;
 	char str[3];
+	char hstr[5];
 	char scr[10] = "Score: ";
+	char hscr[20] = "High Score: ";
 	sprintf(str, "%d", score);
-	
-	strcat(scr,str);
+	sprintf(hstr, "%d", hscore);
+
+	strcat(scr, str);
+	strcat(hscr, hstr);
+
 	setcolor(RED);
 	settextjustify(CENTER_TEXT, CENTER_TEXT);
 	settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 10);
@@ -189,20 +217,41 @@ void gameOver(int score)
 
 	settextjustify(CENTER_TEXT, CENTER_TEXT);
 	settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 5);
-	outtextxy((width / 2), 450, (char *)"High Score: ");
+	outtextxy((width / 2), 350, (char *)hscr);
 
 	settextjustify(CENTER_TEXT, CENTER_TEXT);
 	settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 5);
-	outtextxy((width / 2), 500, (char *)scr);
-	// strcat("Score: ",str)
+	outtextxy((width / 2), 400, (char *)scr);
 
-	// settextjustify(CENTER_TEXT, CENTER_TEXT);
-	// settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 5);
-	// outtextxy((width / 2)+ 50, 500, (char *)sprintf(str,"%d",10));
+	settextjustify(RIGHT_TEXT, CENTER_TEXT);
+	settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 3);
+	outtextxy((width / 2) - 50, 550, (char *)"Press Space to play again.");
+
+	settextjustify(LEFT_TEXT, CENTER_TEXT);
+	settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 3);
+	outtextxy((width / 2) + 100, 550, (char *)"Press Esc to quit the game.");
+
+	while (1)
+	{
+		if (kbhit())
+		{
+			ch = getch();
+			if (int(ch) == 32)
+			{
+				printf("Enter pressed");
+				startGame();
+			}
+			else if (int(ch) == 27)
+			{
+				exit(0);
+			}
+		}
+	}
 }
 
 void boundary()
 {
+
 	setfillstyle(4, 6);
 
 	bar(8, 8, 1270, 24);
@@ -234,8 +283,30 @@ void food()
 	setfillstyle(1, 2);
 	while (getpixel(rx, ry) != 0)
 	{
-		rx = s * (1 + rand() % (1270 / s - 1));
-		ry = s * (1 + rand() % (680 / s - 1));
+		rx = s * (1 + rand() % (1268 / s - 1));
+		ry = s * (1 + rand() % (678 / s - 1));
 	}
 	bar(rx - s / 2, ry - s / 2, rx + s / 2, ry + s / 2);
+}
+
+int highScore(int score)
+{
+	FILE *fptr;
+	int hscore = 0;
+	int fscore;
+
+	fptr = fopen("highscore.txt", "r");
+	if (fptr == NULL)
+	{
+		fptr = fopen("highscore.txt", "w");
+	}
+
+	if (score > hscore)
+	{
+		hscore = score;
+		printf("Highscore: %d", hscore);
+		fprintf(fptr, "%d", hscore);
+	}
+	fscanf(fptr, "%d", &fscore);
+	return fscore;
 }
