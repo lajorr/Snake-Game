@@ -10,6 +10,7 @@ void snakeinit();
 void food();
 void startGame();
 void homeScreen();
+void gameOver(int);
 
 int main()
 {
@@ -94,6 +95,7 @@ void homeScreen()
 void startGame()
 {
 	cleardevice();
+	Sleep(300);
 	srand(time(NULL));
 	// detectgraph(&gd,&gm);
 	// initgraph(&gd,&gm,NULL);
@@ -133,7 +135,10 @@ void startGame()
 
 		// terminating condition
 		if (getpixel(X[0], Y[0]) == 1)
+		{
+			printf("game over");
 			break;
+		}
 
 		// updating direction
 		if ((GetAsyncKeyState(VK_RIGHT)) && (d != 0))
@@ -161,8 +166,39 @@ void startGame()
 
 	// printing the score
 	printf("score : %d", l - 5);
+	printf("gameover");
+	gameOver(l - 5);
 	while (!GetAsyncKeyState(VK_RETURN))
 		;
+}
+void gameOver(int score)
+{
+	char str[3];
+	char scr[10] = "Score: ";
+	sprintf(str, "%d", score);
+	
+	strcat(scr,str);
+	setcolor(RED);
+	settextjustify(CENTER_TEXT, CENTER_TEXT);
+	settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 10);
+	outtextxy((width / 2), 150, (char *)"Game");
+
+	settextjustify(CENTER_TEXT, CENTER_TEXT);
+	settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 10);
+	outtextxy((width / 2), 250, (char *)"Over");
+
+	settextjustify(CENTER_TEXT, CENTER_TEXT);
+	settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 5);
+	outtextxy((width / 2), 450, (char *)"High Score: ");
+
+	settextjustify(CENTER_TEXT, CENTER_TEXT);
+	settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 5);
+	outtextxy((width / 2), 500, (char *)scr);
+	// strcat("Score: ",str)
+
+	// settextjustify(CENTER_TEXT, CENTER_TEXT);
+	// settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 5);
+	// outtextxy((width / 2)+ 50, 500, (char *)sprintf(str,"%d",10));
 }
 
 void boundary()
