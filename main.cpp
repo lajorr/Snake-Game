@@ -5,17 +5,29 @@
 #define width 1280
 
 int i, X[100], Y[100], rx, ry, gm, gd, l, d = 2, s = 16;
+int score;
+int hscore;
+FILE *fptr;
 
 void boundary();
 void snakeinit();
 void food();
-int highScore(int);
+void highScore();
 void startGame();
 void homeScreen();
-void gameOver(int, int);
+void gameOver();
+void text(int, int, int, char *);
 
 int main()
 {
+	fptr = fopen("highscore.txt", "r");
+	if (fptr == NULL)
+	{
+		fptr = fopen("highscore.txt", "w");
+		fprintf(fptr, "%d%d", 0, 0);
+		fclose(fptr);
+	}
+
 	initwindow(width, height);
 	homeScreen();
 	closegraph();
@@ -24,24 +36,20 @@ int main()
 }
 void homeScreen()
 {
-	int i, j;
-	int margin_x = 20;
-	int margin_y = 20;
+	int i, j, margin_x = 20, margin_y = 20, borderColor = 10, fillColor = 10, size = 50;
 
-	int borderColor = 10;
-	int fillColor = 10;
-	int size = 50;
+	score = 0;
 
 	setfillstyle(SOLID_FILL, fillColor);
-	// setcolor(borderColor);
 
-	/// horizontall
+	/// horizontall boxes
 	for (i = margin_x, j = margin_y; i < width - 50; i += size)
 	{
 		setcolor(borderColor);
 		rectangle(i, j, i + (size - 10), j + (size - 10));
 		floodfill(i + 1, j + 1, borderColor);
 
+		// i = current pos + (size * no of boxes) this is the last box in the horizontal row
 		if (i == margin_x + (size * 24))
 		{
 			for (int k = 0; k < 4; k++)
@@ -53,6 +61,7 @@ void homeScreen()
 				j += size;
 			}
 
+			//
 			rectangle(i + 14, j, i + (size - 10) - 13, j + (size - 10) - 28);
 			floodfill(i + 15, j + 1, borderColor);
 
@@ -67,14 +76,13 @@ void homeScreen()
 		}
 	}
 
-	// vertical
+	// vertical boxes in home screen
 	for (i = margin_x, j = margin_y + size; j <= height - 50; j += size)
 	{
-		// setfillstyle(SOLID_FILL, BLUE);
-		// setcolor(GREEN);
 		rectangle(i, j, i + (size - 10), j + (size - 10));
 		floodfill(i + 1, j + 1, borderColor);
-		// 610 = current pos + (size * no of boxes)
+		// j = current pos + (size * no of boxes) this is the last box in the vertical column
+
 		if (j == (margin_y + size) + (size * 11))
 		{
 			i += size;
@@ -87,13 +95,11 @@ void homeScreen()
 	{
 
 		setcolor(9);
-		settextjustify(CENTER_TEXT, CENTER_TEXT);
-		settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 10);
-		outtextxy((width / 2), 350, (char *)"Snake Game");
+		// writes text in main screen
+		text(10, (width / 2), 350, (char *)"Snake Game");
+		text(5, (width / 2), 450, (char *)"Press Space To Play");
 
-		settextjustify(CENTER_TEXT, CENTER_TEXT);
-		settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 5);
-		outtextxy((width / 2), 450, (char *)"Press Space To Play");
+		// checks for keyboard entry
 		if (kbhit())
 		{
 
@@ -103,7 +109,7 @@ void homeScreen()
 			ch = getch();
 			if (int(ch) == 32)
 			{
-				printf("Enter pressed");
+				printf("Space pressed");
 				startGame();
 			}
 		}
@@ -112,10 +118,9 @@ void homeScreen()
 
 void startGame()
 {
-	int score;
-	int hscore;
 
 	cleardevice();
+	score = 0;
 	Sleep(300);
 	srand(time(NULL));
 	// detectgraph(&gd,&gm);
@@ -186,20 +191,22 @@ void startGame()
 
 	// printing the score
 	score = l - 5;
-	printf("score : %d", score);
-	// printf("gameover");
-	hscore = highScore(score);
-	gameOver(score, hscore);
+	highScore();
+	gameOver();
 	// while (!GetAsyncKeyState(VK_RETURN))
 	// 	;
 }
-void gameOver(int score, int hscore)
+void gameOver()
 {
 	char ch;
 	char str[3];
 	char hstr[5];
 	char scr[10] = "Score: ";
 	char hscr[20] = "High Score: ";
+
+	fscanf(fptr, "%d", &hscore);
+	printf("\n\n This feom gameOver: %d \n\n", hscore);
+
 	sprintf(str, "%d", score);
 	sprintf(hstr, "%d", hscore);
 
@@ -207,29 +214,37 @@ void gameOver(int score, int hscore)
 	strcat(hscr, hstr);
 
 	setcolor(RED);
-	settextjustify(CENTER_TEXT, CENTER_TEXT);
-	settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 10);
-	outtextxy((width / 2), 150, (char *)"Game");
+	/// Writes Text in game over screen
+	text(10, (width / 2), 150, (char *)"GAME");
+	text(10, (width / 2), 250, (char *)"OVER");
+	text(5, (width / 2), 400, (char *)scr);
+	text(5, (width / 2), 350, (char *)hscr);
+	text(3, (width / 2) - 50, 550, (char *)"Press Space to play again.");
+	text(3, (width / 2) + 100, 550, (char *)"Press Esc to quit the game.");
 
-	settextjustify(CENTER_TEXT, CENTER_TEXT);
-	settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 10);
-	outtextxy((width / 2), 250, (char *)"Over");
+	// settextjustify(CENTER_TEXT, CENTER_TEXT);
+	// settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 10);
+	// outtextxy((width / 2), 150, (char *)"Game");
 
-	settextjustify(CENTER_TEXT, CENTER_TEXT);
-	settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 5);
-	outtextxy((width / 2), 350, (char *)hscr);
+	// settextjustify(CENTER_TEXT, CENTER_TEXT);
+	// settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 10);
+	// outtextxy((width / 2), 250, (char *)"Over");
 
-	settextjustify(CENTER_TEXT, CENTER_TEXT);
-	settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 5);
-	outtextxy((width / 2), 400, (char *)scr);
+	// settextjustify(CENTER_TEXT, CENTER_TEXT);
+	// settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 5);
+	// outtextxy((width / 2), 350, (char *)hscr);
 
-	settextjustify(RIGHT_TEXT, CENTER_TEXT);
-	settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 3);
-	outtextxy((width / 2) - 50, 550, (char *)"Press Space to play again.");
+	// settextjustify(CENTER_TEXT, CENTER_TEXT);
+	// settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 5);
+	// outtextxy((width / 2), 400, (char *)scr);
 
-	settextjustify(LEFT_TEXT, CENTER_TEXT);
-	settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 3);
-	outtextxy((width / 2) + 100, 550, (char *)"Press Esc to quit the game.");
+	// settextjustify(RIGHT_TEXT, CENTER_TEXT);
+	// settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 3);
+	// outtextxy((width / 2) - 50, 550, (char *)"Press Space to play again.");
+
+	// settextjustify(LEFT_TEXT, CENTER_TEXT);
+	// settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 3);
+	// outtextxy((width / 2) + 100, 550, (char *)"Press Esc to quit the game.");
 
 	while (1)
 	{
@@ -289,24 +304,29 @@ void food()
 	bar(rx - s / 2, ry - s / 2, rx + s / 2, ry + s / 2);
 }
 
-int highScore(int score)
+void highScore()
 {
-	FILE *fptr;
-	int hscore = 0;
-	int fscore;
+	char fnum[5];
 
 	fptr = fopen("highscore.txt", "r");
-	if (fptr == NULL)
-	{
-		fptr = fopen("highscore.txt", "w");
-	}
-
+	// fscanf(fptr, "%d", &hscore);
+	fgets(fnum, 5, fptr);
+	hscore = atoi(fnum);
+	fclose(fptr);
 	if (score > hscore)
 	{
 		hscore = score;
-		printf("Highscore: %d", hscore);
+		fptr = fopen("highscore.txt", "w");
+
 		fprintf(fptr, "%d", hscore);
+		fclose(fptr);
+		printf("Highscore: %d", hscore);
 	}
-	fscanf(fptr, "%d", &fscore);
-	return fscore;
+}
+
+void text(int fontSize, int x_pos, int y_pos, char *str)
+{
+	settextjustify(CENTER_TEXT, CENTER_TEXT);
+	settextstyle(SANS_SERIF_FONT, HORIZ_DIR, fontSize);
+	outtextxy(x_pos, y_pos, str);
 }
