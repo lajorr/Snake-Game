@@ -52,7 +52,11 @@ void homeScreen()
 		// i = current pos + (size * no of boxes) this is the last box in the horizontal row
 		if (i == margin_x + (size * 24))
 		{
-			for (int k = 0; k < 4; k++)
+
+			j = j + size;
+
+			// boxes in the last column
+			for (int k = 0; k < 3; k++)
 			{
 
 				setcolor(borderColor);
@@ -61,7 +65,7 @@ void homeScreen()
 				j += size;
 			}
 
-			//
+			// last crosshair box
 			rectangle(i + 14, j, i + (size - 10) - 13, j + (size - 10) - 28);
 			floodfill(i + 15, j + 1, borderColor);
 
@@ -100,18 +104,15 @@ void homeScreen()
 		text(5, (width / 2), 450, (char *)"Press Space To Play");
 
 		// checks for keyboard entry
-		if (kbhit())
+		// 32 -- space
+		// 13 -- enter
+		// 27 -- esc
+		ch = getch();
+		if (int(ch) == 32)
 		{
-
-			// 32 -- space
-			// 13 -- enter
-			// 27 -- esc
-			ch = getch();
-			if (int(ch) == 32)
-			{
-				printf("Space pressed");
-				startGame();
-			}
+			printf("Space pressed");
+			cleardevice();
+			startGame();
 		}
 	}
 }
@@ -119,10 +120,11 @@ void homeScreen()
 void startGame()
 {
 
-	cleardevice();
 	score = 0;
+	cleardevice();
 	Sleep(300);
-	srand(time(NULL));
+	srand(time(0));
+
 	// detectgraph(&gd,&gm);
 	// initgraph(&gd,&gm,NULL);
 
@@ -135,7 +137,7 @@ void startGame()
 
 	// food at random location
 	food();
-	delay(2000);
+	delay(1000);
 
 	while (1)
 	{
@@ -159,10 +161,12 @@ void startGame()
 			Y[0] = Y[0] + s;
 
 		// terminating condition
-		if (getpixel(X[0], Y[0]) == 1)
+		if (getpixel(X[0], Y[0]) == BLUE)
 		{
-
-			break;
+			// printing the score
+			// score = l - 5;
+			gameOver();
+			// break;
 		}
 
 		// updating direction
@@ -180,6 +184,7 @@ void startGame()
 		{
 			food();
 			l = l + 1;
+			score++;
 		}
 
 		// displaying the snake
@@ -189,10 +194,6 @@ void startGame()
 		delay(100);
 	}
 
-	// printing the score
-	score = l - 5;
-	highScore();
-	gameOver();
 	// while (!GetAsyncKeyState(VK_RETURN))
 	// 	;
 }
@@ -203,6 +204,8 @@ void gameOver()
 	char hstr[5];
 	char scr[10] = "Score: ";
 	char hscr[20] = "High Score: ";
+
+	cleardevice();
 
 	fscanf(fptr, "%d", &hscore);
 	printf("\n\n This feom gameOver: %d \n\n", hscore);
@@ -219,48 +222,35 @@ void gameOver()
 	text(10, (width / 2), 250, (char *)"OVER");
 	text(5, (width / 2), 400, (char *)scr);
 	text(5, (width / 2), 350, (char *)hscr);
-	text(3, (width / 2) - 50, 550, (char *)"Press Space to play again.");
-	text(3, (width / 2) + 100, 550, (char *)"Press Esc to quit the game.");
 
-	// settextjustify(CENTER_TEXT, CENTER_TEXT);
-	// settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 10);
-	// outtextxy((width / 2), 150, (char *)"Game");
-
-	// settextjustify(CENTER_TEXT, CENTER_TEXT);
-	// settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 10);
-	// outtextxy((width / 2), 250, (char *)"Over");
-
-	// settextjustify(CENTER_TEXT, CENTER_TEXT);
-	// settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 5);
-	// outtextxy((width / 2), 350, (char *)hscr);
-
-	// settextjustify(CENTER_TEXT, CENTER_TEXT);
-	// settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 5);
-	// outtextxy((width / 2), 400, (char *)scr);
-
-	// settextjustify(RIGHT_TEXT, CENTER_TEXT);
-	// settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 3);
-	// outtextxy((width / 2) - 50, 550, (char *)"Press Space to play again.");
-
-	// settextjustify(LEFT_TEXT, CENTER_TEXT);
-	// settextstyle(SANS_SERIF_FONT, HORIZ_DIR, 3);
-	// outtextxy((width / 2) + 100, 550, (char *)"Press Esc to quit the game.");
+	if (score > hscore)
+	{
+		text(3, (width / 2), 500, (char *)"You have beaten the highscore !!!!");
+		text(3, (width / 2) - 150, 600, (char *)"Press Space to play again.");
+		text(3, (width / 2) + 200, 600, (char *)"Press Esc to quit the game.");
+	}
+	else
+	{
+		text(3, (width / 2) - 150, 550, (char *)"Press Space to play again.");
+		text(3, (width / 2) + 200, 550, (char *)"Press Esc to quit the game.");
+	}
+	highScore();
 
 	while (1)
 	{
-		if (kbhit())
+		ch = getch();
+		if (int(ch) == 32)
 		{
-			ch = getch();
-			if (int(ch) == 32)
-			{
-				printf("Enter pressed");
-				startGame();
-			}
-			else if (int(ch) == 27)
-			{
-				exit(0);
-			}
+			printf("Enter pressed");
+			startGame();
 		}
+		else if (int(ch) == 27)
+		{
+			exit(0);
+		}
+		// if (kbhit())
+		// {
+		// }
 	}
 }
 
