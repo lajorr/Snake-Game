@@ -110,7 +110,6 @@ void homeScreen()
 		ch = getch();
 		if (int(ch) == 32)
 		{
-			printf("Space pressed");
 			cleardevice();
 			startGame();
 		}
@@ -208,8 +207,6 @@ void gameOver()
 	cleardevice();
 
 	fscanf(fptr, "%d", &hscore);
-	printf("\n\n This feom gameOver: %d \n\n", hscore);
-
 	sprintf(str, "%d", score);
 	sprintf(hstr, "%d", hscore);
 
@@ -241,16 +238,12 @@ void gameOver()
 		ch = getch();
 		if (int(ch) == 32)
 		{
-			printf("Enter pressed");
 			startGame();
 		}
 		else if (int(ch) == 27)
 		{
 			exit(0);
 		}
-		// if (kbhit())
-		// {
-		// }
 	}
 }
 
