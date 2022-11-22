@@ -28,7 +28,7 @@ int main()
 		fclose(fptr);
 	}
 
-	initwindow(width, height);
+	initwindow(width, height,"Snake Game");
 	homeScreen();
 	closegraph();
 	getch();
@@ -95,8 +95,7 @@ void homeScreen()
 		}
 	}
 	char ch;
-	while (1)
-	{
+	
 
 		setcolor(9);
 		// writes text in main screen
@@ -113,7 +112,6 @@ void homeScreen()
 			cleardevice();
 			startGame();
 		}
-	}
 }
 
 void startGame()
@@ -123,11 +121,6 @@ void startGame()
 	cleardevice();
 	Sleep(300);
 	srand(time(0));
-
-	// detectgraph(&gd,&gm);
-	// initgraph(&gd,&gm,NULL);
-
-	// resolution to full screen
 
 	// fill initial snake body
 	snakeinit();
@@ -236,11 +229,11 @@ void gameOver()
 	while (1)
 	{
 		ch = getch();
-		if (int(ch) == 32)
+		if (ch == 32)
 		{
 			startGame();
 		}
-		else if (int(ch) == 27)
+		else if (ch == 27)
 		{
 			exit(0);
 		}
@@ -290,6 +283,7 @@ void food()
 void highScore()
 {
 	char fnum[5];
+
 
 	fptr = fopen("highscore.txt", "r");
 	// fscanf(fptr, "%d", &hscore);
